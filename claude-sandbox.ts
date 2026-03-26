@@ -24,8 +24,7 @@ async function handleQuery(prompt: string): Promise<string> {
       args: ["install", "-g", "@anthropic-ai/claude-code"],
       sudo: true,
     });
-    const installExit = await install.exitCode;
-    if (installExit !== 0) {
+    if (install.exitCode !== 0) {
       const err = await install.output("stderr");
       throw new Error(`Failed to install Claude Code CLI: ${err}`);
     }
@@ -40,13 +39,11 @@ async function handleQuery(prompt: string): Promise<string> {
         prompt,
       ],
       env: { ANTHROPIC_API_KEY },
-      timeout: ms("5m"),
     });
 
-    const exitCode = await command.exitCode;
-    if (exitCode !== 0) {
+    if (command.exitCode !== 0) {
       const stderr = await command.output("stderr");
-      throw new Error(`Claude Code exited with code ${exitCode}: ${stderr}`);
+      throw new Error(`Claude Code exited with code ${command.exitCode}: ${stderr}`);
     }
 
     return await command.output("stdout");
